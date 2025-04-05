@@ -3,7 +3,7 @@ import { Welcome } from "../welcome/welcome";
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "Up Web App" },
+    { title: "Up Custom Web App" },
     { name: "description", content: "Welcome to React Router!" },
   ];
 }
