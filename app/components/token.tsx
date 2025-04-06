@@ -41,7 +41,6 @@ export default function Token(props: Readonly<TokenProps>) {
                     },
                 }}
             />
-            
         </div>
     )
 }
