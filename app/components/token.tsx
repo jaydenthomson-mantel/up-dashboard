@@ -1,3 +1,6 @@
+import Clear from "@mui/icons-material/Clear";
+import IconButton from "@mui/material/IconButton";
+import InputAdornment from "@mui/material/InputAdornment";
 import TextField from "@mui/material/TextField";
 import type { Dispatch } from "react";
 
@@ -19,17 +22,26 @@ export default function Token(props: Readonly<TokenProps>) {
         return { isError: false, errorReason: "" };
     })();
 
-    const maskedToken = props.token.replace(/[a-zA-Z0-9]/g, '•');
-
     return (
-        <TextField
-            fullWidth
-            error={isError}
-            id="token-text-field"
-            label="Up API Token"
-            helperText={errorReason}
-            value={maskedToken}
-            onChange={(e) => props.setToken(e.target.value)}
-        />
+        <div>
+            <TextField
+                error={isError}
+                id="token-text-field"
+                label="Up API Token"
+                helperText={errorReason}
+                value={props.token}
+                onChange={(e) => props.setToken(e.target.value)}
+                slotProps={{
+                    input: {
+                        endAdornment: <InputAdornment position="end">
+                            <IconButton aria-label="clear token" onClick={() => props.setToken("")}>
+                                <Clear />
+                            </IconButton>    
+                        </InputAdornment>,
+                    },
+                }}
+            />
+            
+        </div>
     )
 }
