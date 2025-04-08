@@ -1,6 +1,6 @@
+import { useAppSelector } from "~/hooks";
 import type { Route } from "./+types/home";
-import Token from "~/components/token";
-import { useState } from "react";
+import Token from "~/features/token/token";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -10,11 +10,11 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Home() {
-  const [token, setToken] = useState("");
+  const token = useAppSelector((state) => state.token.value)
   console.log(token)
   return (
     <div className="flex min-h-screen items-center justify-center">
-      <Token token={token} setToken={setToken}/>
+      <Token/>
     </div>
   );
 }
