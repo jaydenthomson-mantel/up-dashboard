@@ -1,5 +1,6 @@
 import type { Route } from "./+types/home";
-import { Welcome } from "../welcome/welcome";
+import Token from "~/components/token";
+import { useState } from "react";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -9,5 +10,11 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Home() {
-  return <Welcome />;
+  const [token, setToken] = useState("");
+  console.log(token)
+  return (
+    <div className="flex min-h-screen items-center justify-center">
+      <Token token={token} setToken={setToken}/>
+    </div>
+  );
 }
