@@ -1,6 +1,6 @@
 import { useAppSelector } from "~/hooks";
 import type { Route } from "./+types/home";
-import Token from "~/features/token/token";
+import Token from "~/features/token/tokenComponent";
 
 export function meta({}: Route.MetaArgs) {
   return [
