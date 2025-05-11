@@ -1,20 +1,25 @@
 import { useAppSelector } from "~/hooks";
-import type { Route } from "./+types/home";
-import Token from "~/features/token/tokenComponent";
+import { selectSignIn } from "~/features/sign-in/signInSlice";
+import { Navigate } from "react-router";
 
-export function meta({}: Route.MetaArgs) {
+export function meta() {
   return [
-    { title: "Up Custom Web App" },
-    { name: "description", content: "Welcome to React Router!" },
+    { title: "Up" },
   ];
 }
 
 export default function Home() {
   const token = useAppSelector((state) => state.token.value)
+  const signedIn = useAppSelector(selectSignIn)
+  
+  if (!signedIn) {
+    return <Navigate to="/sign-in" replace />;
+  }
+
   console.log(token)
   return (
     <div className="flex min-h-screen items-center justify-center">
-      <Token/>
+      Home Screen
     </div>
   );
 }
