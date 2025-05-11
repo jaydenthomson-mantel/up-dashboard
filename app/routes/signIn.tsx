@@ -8,6 +8,9 @@ import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
+import { useNavigate } from 'react-router';
+import { useAppDispatch } from '~/hooks';
+import { signIn } from '~/features/sign-in/signInSlice';
 
 export function meta() {
   return [
@@ -59,15 +62,20 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
   },
 }));
 
-const handleSubmit = (event: React.FormEvent<HTMLFormElement>, error: boolean) => {
-  if (error) {
-    event.preventDefault();
-    return;
-  }
+const handleSubmit = (
+  event: React.FormEvent<HTMLFormElement>, 
+  error: boolean,
+  navigate: ReturnType<typeof useNavigate>,
+  dispatch: ReturnType<typeof useAppDispatch>
+) => {
+  event.preventDefault();
+
+  if (error) { return; }
+  
   const data = new FormData(event.currentTarget);
-  console.log({
-    accessToken: data.get('accessToken'),
-  });
+  const accessToken = data.get('accessToken') as string;
+  dispatch(signIn(accessToken));
+  navigate('/');
 };
 
 const validateAccessToken = (
@@ -94,6 +102,8 @@ const validateAccessToken = (
 export default function SignIn() {
   const [error, setError] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState('');
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   return (
     <SignInContainer direction="column" justifyContent="space-between">
@@ -107,7 +117,7 @@ export default function SignIn() {
         </Typography>
         <Box
           component="form"
-          onSubmit={(e) => handleSubmit(e, error)}
+          onSubmit={(e) => handleSubmit(e, error, navigate, dispatch)}
           noValidate
           sx={{
             display: 'flex',
