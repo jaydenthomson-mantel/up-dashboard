@@ -1,5 +1,5 @@
 import { useAppSelector } from "~/hooks";
-import { selectSignIn } from "~/features/sign-in/signInSlice";
+import { selectSignInState } from "~/features/sign-in/signInSlice";
 import { Navigate } from "react-router";
 
 export function meta() {
@@ -9,9 +9,9 @@ export function meta() {
 }
 
 export default function Home() {
-  const signedIn = useAppSelector(selectSignIn)
+  const signInState = useAppSelector(selectSignInState)
   
-  if (!signedIn) {
+  if (!signInState.signedIn) {
     return <Navigate to="/sign-in" replace />;
   }
 

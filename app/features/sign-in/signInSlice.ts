@@ -70,7 +70,9 @@ export const signInSlice = createSlice({
 })
 
 export const { signOut } = signInSlice.actions
-export const selectToken = (state: RootState) => state.signIn.accessToken
-export const selectSignIn = (state: RootState) => state.signIn.signedIn
+export const selectSignInState = (state: RootState) => ({
+    accessToken: state.signIn.accessToken,
+    signedIn: state.signIn.signedIn
+})
 export const selectSignInError = (state: RootState) => state.signIn.error
 export default signInSlice.reducer
