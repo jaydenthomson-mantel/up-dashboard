@@ -3,12 +3,14 @@ import type { RootState } from "~/store"
 
 interface SignInState {
     signedIn: boolean
-    token: string
+    accessToken: string
+    isValidAccessToken: boolean
 }
 
 const initialState: SignInState = {
     signedIn: false,
-    token: "",
+    accessToken: "",
+    isValidAccessToken: false
 }
 
 export const signInSlice = createSlice({
@@ -16,17 +18,19 @@ export const signInSlice = createSlice({
     initialState,
     reducers: {
         signIn: (state, action: PayloadAction<string>) => {
-            state.token = action.payload
+            state.accessToken = action.payload
             state.signedIn = true
+            state.isValidAccessToken = true
         },
         signOut: (state) => {
-            state.token = ""
+            state.accessToken = ""
             state.signedIn = false
+            state.isValidAccessToken = false;
         },
     },
 })
 
 export const { signIn, signOut } = signInSlice.actions
-export const selectToken = (state: RootState) => state.signIn.token
+export const selectToken = (state: RootState) => state.signIn.accessToken
 export const selectSignIn = (state: RootState) => state.signIn.signedIn
 export default signInSlice.reducer
