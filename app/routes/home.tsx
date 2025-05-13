@@ -9,14 +9,12 @@ export function meta() {
 }
 
 export default function Home() {
-  const token = useAppSelector((state) => state.token.value)
   const signedIn = useAppSelector(selectSignIn)
   
   if (!signedIn) {
     return <Navigate to="/sign-in" replace />;
   }
 
-  console.log(token)
   return (
     <div className="flex min-h-screen items-center justify-center">
       Home Screen

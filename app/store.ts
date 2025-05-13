@@ -1,11 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit'
-import tokenReducer from './features/token/tokenSlice'
 import accountReducer from './features/accounts/accountSlice'
 import signInReducer from "./features/sign-in/signInSlice"
 
 export const store = configureStore({
   reducer: {
-    token: tokenReducer,
     account: accountReducer,
     signIn: signInReducer
   },
