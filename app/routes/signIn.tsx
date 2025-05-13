@@ -63,44 +63,37 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
   },
 }));
 
-const handleSubmit = (
-  event: React.FormEvent<HTMLFormElement>, 
-  error: boolean,
+const handleSubmit = async (
+  event: React.FormEvent<HTMLFormElement>,
+  setError: React.Dispatch<React.SetStateAction<boolean>>,
+  setErrorMessage: React.Dispatch<React.SetStateAction<string>>, 
   navigate: ReturnType<typeof useNavigate>,
   dispatch: ReturnType<typeof useAppDispatch>
 ) => {
   event.preventDefault();
-
-  if (error) { return; }
-  
   const data = new FormData(event.currentTarget);
   const accessToken = data.get('accessToken') as string;
-  dispatch(signIn(accessToken));
-  navigate('/');
+  const { error, errorReason } = await validateAccessToken(accessToken);
+  setError(error);
+  setErrorMessage(errorReason);
+  
+  if (!error) {
+    dispatch(signIn(accessToken));
+    navigate('/');
+  }
 };
 
-const validateAccessToken = async (
-  setError: React.Dispatch<React.SetStateAction<boolean>>,
-  setErrorMessage: React.Dispatch<React.SetStateAction<string>>,
-) => {
-  const accessTokenElement = document.getElementById('accessToken') as HTMLInputElement;
-  const accessToken = accessTokenElement.value;
-
-  const { error, errorReason } = await (async () => {
-    if (accessToken === "") {
-      return { error: true, errorReason: "Access token is empty." };
-    }
-    if (!validTokenRegex.test(accessToken)) {
-      return { error: true, errorReason: "Access token is not in the expected format." };
-    }
-    if ((await ping(accessToken)).error != null) {
-      return { error: true, errorReason: "Access token was not accepted by UP API" };
-    }
-    return { error: false, errorReason: "" };
-  })();
-
-  setError(error)
-  setErrorMessage(errorReason)
+const validateAccessToken = async (accessToken: string): Promise<{error: boolean, errorReason: string}> => {
+  if (accessToken === "") {
+    return { error: true, errorReason: "Access token is empty." };
+  }
+  if (!validTokenRegex.test(accessToken)) {
+    return { error: true, errorReason: "Access token is not in the expected format." };
+  }
+  if ((await ping(accessToken)).error != null) {
+    return { error: true, errorReason: "Access token was not accepted by UP API" };
+  }
+  return { error: false, errorReason: "" };
 };
 
 export default function SignIn() {
@@ -121,7 +114,7 @@ export default function SignIn() {
         </Typography>
         <Box
           component="form"
-          onSubmit={(e) => handleSubmit(e, error, navigate, dispatch)}
+          onSubmit={(e) => handleSubmit(e, setError, setErrorMessage, navigate, dispatch)}
           noValidate
           sx={{
             display: 'flex',
@@ -150,9 +143,8 @@ export default function SignIn() {
             type="submit"
             fullWidth
             variant="contained"
-            onClick={(e) => validateAccessToken(setError, setErrorMessage)}
           >
-            Sign in
+            Sign In
           </Button>
         </Box>
       </Card>
