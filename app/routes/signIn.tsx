@@ -11,6 +11,7 @@ import { styled } from '@mui/material/styles';
 import { useNavigate } from 'react-router';
 import { useAppDispatch } from '~/hooks';
 import { signIn } from '~/features/sign-in/signInSlice';
+import { ping } from '~/utils/pingApi';
 
 export function meta() {
   return [
@@ -78,19 +79,22 @@ const handleSubmit = (
   navigate('/');
 };
 
-const validateAccessToken = (
+const validateAccessToken = async (
   setError: React.Dispatch<React.SetStateAction<boolean>>,
   setErrorMessage: React.Dispatch<React.SetStateAction<string>>,
 ) => {
   const accessTokenElement = document.getElementById('accessToken') as HTMLInputElement;
   const accessToken = accessTokenElement.value;
 
-  const { error, errorReason } = (() => {
+  const { error, errorReason } = await (async () => {
     if (accessToken === "") {
-      return { error: true, errorReason: "Token is empty." };
+      return { error: true, errorReason: "Access token is empty." };
     }
     if (!validTokenRegex.test(accessToken)) {
-      return { error: true, errorReason: "Token is not in the expected format." };
+      return { error: true, errorReason: "Access token is not in the expected format." };
+    }
+    if ((await ping(accessToken)).error != null) {
+      return { error: true, errorReason: "Access token was not accepted by UP API" };
     }
     return { error: false, errorReason: "" };
   })();
