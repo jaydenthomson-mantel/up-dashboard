@@ -24,10 +24,10 @@ export const validateAndSignIn = createAsyncThunk(
     async (accessToken: string, { rejectWithValue }) => {
         // Validate the token format and emptiness
         if (accessToken === "") {
-            return rejectWithValue("Access token is empty.");
+            return rejectWithValue("Access token is empty");
         }
         if (!validTokenRegex.test(accessToken)) {
-            return rejectWithValue("Access token is not in the expected format.");
+            return rejectWithValue("Access token is not in the expected format");
         }
 
         // Validate with the API
