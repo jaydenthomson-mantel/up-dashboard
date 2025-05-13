@@ -9,17 +9,14 @@ import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
 import { useNavigate } from 'react-router';
-import { useAppDispatch } from '~/hooks';
-import { signIn } from '~/features/sign-in/signInSlice';
-import { ping } from '~/utils/pingApi';
+import { useAppDispatch, useAppSelector } from '~/hooks';
+import { validateAndSignIn, selectSignInError } from '~/features/sign-in/signInSlice';
 
 export function meta() {
   return [
     { title: "Up - Sign In" },
   ];
 }
-
-const validTokenRegex = /^up:yeah:[a-zA-Z0-9]+$/
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -65,42 +62,24 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
 
 const handleSubmit = async (
   event: React.FormEvent<HTMLFormElement>,
-  setError: React.Dispatch<React.SetStateAction<boolean>>,
-  setErrorMessage: React.Dispatch<React.SetStateAction<string>>, 
   navigate: ReturnType<typeof useNavigate>,
   dispatch: ReturnType<typeof useAppDispatch>
 ) => {
   event.preventDefault();
   const data = new FormData(event.currentTarget);
   const accessToken = data.get('accessToken') as string;
-  const { error, errorReason } = await validateAccessToken(accessToken);
-  setError(error);
-  setErrorMessage(errorReason);
+  const resultAction = await dispatch(validateAndSignIn(accessToken));
   
-  if (!error) {
-    dispatch(signIn(accessToken));
+  if (validateAndSignIn.fulfilled.match(resultAction)) {
     navigate('/');
   }
 };
 
-const validateAccessToken = async (accessToken: string): Promise<{error: boolean, errorReason: string}> => {
-  if (accessToken === "") {
-    return { error: true, errorReason: "Access token is empty." };
-  }
-  if (!validTokenRegex.test(accessToken)) {
-    return { error: true, errorReason: "Access token is not in the expected format." };
-  }
-  if ((await ping(accessToken)).error != null) {
-    return { error: true, errorReason: "Access token was not accepted by UP API" };
-  }
-  return { error: false, errorReason: "" };
-};
-
 export default function SignIn() {
-  const [error, setError] = React.useState(false);
-  const [errorMessage, setErrorMessage] = React.useState('');
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const errorMessage = useAppSelector(selectSignInError);
+  const error = Boolean(errorMessage);
 
   return (
     <SignInContainer direction="column" justifyContent="space-between">
@@ -114,7 +93,7 @@ export default function SignIn() {
         </Typography>
         <Box
           component="form"
-          onSubmit={(e) => handleSubmit(e, setError, setErrorMessage, navigate, dispatch)}
+          onSubmit={(e) => handleSubmit(e, navigate, dispatch)}
           noValidate
           sx={{
             display: 'flex',
@@ -127,7 +106,7 @@ export default function SignIn() {
             <FormLabel htmlFor="accessToken">API Key</FormLabel>
             <TextField
               error={error}
-              helperText={errorMessage}
+              helperText={errorMessage ?? ''}
               name="accessToken"
               placeholder="••••••••••••••••••••••••••••••••••••"
               type="accessToken"
