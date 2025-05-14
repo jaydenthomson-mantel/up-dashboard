@@ -18,16 +18,24 @@ const initialState: SignInState = {
 
 const validTokenRegex = /^up:yeah:[a-zA-Z0-9]+$/
 
+export const validateAccessToken = (accessToken: string) => {
+    if (accessToken === "") {
+        return { error: true, errorReason: "Access token is empty." };
+    }
+    if (!validTokenRegex.test(accessToken)) {
+        return { error: true, errorReason: "Access token is not in the expected format." };
+    }
+    return { error: false, errorReason: "" };
+};
+
 // Async thunk for validating token and signing in
 export const validateAndSignIn = createAsyncThunk(
     'signIn/validateAndSignIn',
     async (accessToken: string, { rejectWithValue }) => {
-        // Validate the token format and emptiness
-        if (accessToken === "") {
-            return rejectWithValue("Access token is empty");
-        }
-        if (!validTokenRegex.test(accessToken)) {
-            return rejectWithValue("Access token is not in the expected format");
+        // Validate token without async call
+        const { error, errorReason } = validateAccessToken(accessToken)
+        if (error === true) {
+            return rejectWithValue(errorReason)
         }
 
         // Validate with the API
