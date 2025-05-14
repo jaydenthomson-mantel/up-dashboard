@@ -3,10 +3,11 @@ import { useSelector } from 'react-redux';
 import { selectAccount, selectAccountState, setAccountsWithPaging } from './accountSlice';
 import { useEffect } from 'react';
 import { getAccounts } from './accountsApi';
-import { useAppDispatch, useAppSelector } from '~/hooks';
-import { selectSignInState, validateAccessToken } from '~/features/sign-in/signInSlice';
+import { useAppDispatch } from '~/hooks';
+import { validateAccessToken } from '~/utils/accessToken';
 
 interface AccountListProps {
+  accessToken: string
   sidebarWidth?: number; // Optional prop to control sidebar width
 }
 
@@ -30,20 +31,20 @@ async function fetchAccountsIfNeeded(
   dispatch(setAccountsWithPaging(result.data));
 }
 
-export default function AccountsSidebarComponent({ 
+export default function AccountsSidebarComponent({
+  accessToken,
   sidebarWidth = 300, // Default width of 300px 
 }: Readonly<AccountListProps>) {
   const dispatch = useAppDispatch();
   const accountState = useSelector(selectAccountState);
-  const signInState = useAppSelector(selectSignInState);
 
   useEffect(() => {
     fetchAccountsIfNeeded(
       accountState.accounts.length,
-      signInState.accessToken,
+      accessToken,
       dispatch
     );
-  }, [accountState.accounts.length, dispatch, signInState]);
+  }, [accessToken]);
 
   return (
     <List sx={{ width: `${sidebarWidth}px` }}>
