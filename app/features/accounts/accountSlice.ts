@@ -1,26 +1,30 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { RootState } from '../../store';
 import type { Account } from './account';
+import type { PagedData } from '~/utils/pagedData';
 
 interface AccountState {
   selectedAccountId: string | null;
   accounts: Account[];
+  nextPageUrl: string | null;
 }
 
 const initialState: AccountState = {
   selectedAccountId: null,
   accounts: [],
+  nextPageUrl: null,
 };
 
 export const accountSlice = createSlice({
   name: 'account',
   initialState,
   reducers: {
-    setAccounts: (state, action: PayloadAction<Account[]>) => {
-      state.accounts = action.payload;
+    setAccountsWithPaging: (state, action: PayloadAction<PagedData<Account>>) => {
+      state.accounts = action.payload.data;
+      state.nextPageUrl = action.payload.links.next || null;
       // Set first account as selected by default if there's no selection yet
-      if (!state.selectedAccountId && action.payload.length > 0) {
-        state.selectedAccountId = action.payload[0].id;
+      if (!state.selectedAccountId && action.payload.data.length > 0) {
+        state.selectedAccountId = action.payload.data[0].id;
       }
     },
     selectAccount: (state, action: PayloadAction<string>) => {
@@ -29,10 +33,9 @@ export const accountSlice = createSlice({
   },
 });
 
-export const { setAccounts, selectAccount } = accountSlice.actions;
+export const { setAccountsWithPaging, selectAccount } = accountSlice.actions;
 
 // Selectors
-export const selectAccounts = (state: RootState) => state.account.accounts;
-export const selectSelectedAccountId = (state: RootState) => state.account.selectedAccountId;
+export const selectAccountState = (state: RootState) => state.account
 
 export default accountSlice.reducer;
