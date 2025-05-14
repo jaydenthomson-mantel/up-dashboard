@@ -1,6 +1,7 @@
 import { useAppSelector } from "~/hooks";
 import { selectSignInState } from "~/features/sign-in/signInSlice";
 import { Navigate } from "react-router";
+import AccountsSidebarComponent from "~/features/accounts/accountsSidebarComponent";
 
 export function meta() {
   return [
@@ -17,7 +18,7 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen items-center justify-center">
-      Home Screen
+      <AccountsSidebarComponent/>
     </div>
   );
 }

@@ -1,30 +1,47 @@
 import { List, ListItem, ListItemButton, Box, Typography } from '@mui/material';
-import type { Account } from './account';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectAccount, selectSelectedAccountId } from './accountSlice';
+import { selectAccount, selectAccountState, setAccountsWithPaging } from './accountSlice';
+import { useEffect } from 'react';
+import { getAccounts } from './accountsApi';
+import { useAppSelector } from '~/hooks';
+import { selectSignInState } from '~/features/sign-in/signInSlice';
 
 interface AccountListProps {
-  accounts: Account[];
   sidebarWidth?: number; // Optional prop to control sidebar width
 }
 
 export default function AccountsSidebarComponent({ 
-  accounts, 
   sidebarWidth = 300, // Default width of 300px 
 }: Readonly<AccountListProps>) {
   const dispatch = useDispatch();
-  const selectedAccountId = useSelector(selectSelectedAccountId);
+  const accountState = useSelector(selectAccountState);
+  const signInState = useAppSelector(selectSignInState);
+
+  useEffect(() => {
+    // Check if accounts list is empty and user is signed in
+    const fetchAccountsIfNeeded = async () => {
+      if (accountState.accounts.length === 0 && signInState.signedIn) {
+        // Fetch first page of accounts
+        const result = await getAccounts(signInState.accessToken);
+        if (result.data && !result.error) {
+          dispatch(setAccountsWithPaging(result.data));
+        }
+      }
+    };
+
+    fetchAccountsIfNeeded();
+  }, [accountState.accounts.length, dispatch, signInState]);
 
   return (
     <List sx={{ width: `${sidebarWidth}px` }}>
-      {accounts.map((account) => (
+      {accountState.accounts.map((account) => (
         <ListItem 
           key={account.id} 
           component="div"
         >
           <ListItemButton 
             onClick={() => dispatch(selectAccount(account.id))}
-            selected={selectedAccountId === account.id}
+            selected={accountState.selectedAccountId === account.id}
             sx={{
               '&.Mui-selected': {
                 backgroundColor: 'rgba(0, 0, 0, 0.08)',
