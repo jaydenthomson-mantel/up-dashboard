@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from "@reduxjs/toolkit"
 import type { RootState } from "~/store"
-import { validateAccessToken } from "~/utils/accessToken"
 import { ping } from "~/utils/pingApi"
 
 interface SignInState {
@@ -16,6 +15,18 @@ const initialState: SignInState = {
     isValidAccessToken: false,
     error: null
 }
+
+const validTokenRegex = /^up:yeah:[a-zA-Z0-9]+$/
+
+export const validateAccessToken = (accessToken: string) => {
+    if (accessToken === "") {
+        return { error: true, errorReason: "Access token is empty." };
+    }
+    if (!validTokenRegex.test(accessToken)) {
+        return { error: true, errorReason: "Access token is not in the expected format." };
+    }
+    return { error: false, errorReason: "" };
+};
 
 // Async thunk for validating token and signing in
 export const validateAndSignIn = createAsyncThunk(

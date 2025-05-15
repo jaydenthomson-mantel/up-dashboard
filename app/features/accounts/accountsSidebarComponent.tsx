@@ -4,7 +4,7 @@ import { selectAccount, selectAccountState, setAccountsWithPaging } from './acco
 import { useEffect } from 'react';
 import { getAccounts } from './accountsApi';
 import { useAppDispatch } from '~/hooks';
-import { validateAccessToken } from '~/utils/accessToken';
+import { validateAccessToken } from '~/features/sign-in/signInSlice';
 
 interface AccountListProps {
   accessToken: string
