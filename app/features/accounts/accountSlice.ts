@@ -27,13 +27,21 @@ export const accountSlice = createSlice({
         state.selectedAccountId = action.payload.data[0].id;
       }
     },
+    appendNextPage: (state, action: PayloadAction<PagedData<Account>>) => {
+      state.accounts = [...state.accounts, ...action.payload.data];
+      state.nextPageUrl = action.payload.links.next || null;
+      // Set first account as selected by default if there's no selection yet
+      if (!state.selectedAccountId && action.payload.data.length > 0) {
+        state.selectedAccountId = action.payload.data[0].id;
+      }
+    },
     selectAccount: (state, action: PayloadAction<string>) => {
       state.selectedAccountId = action.payload;
     },
   },
 });
 
-export const { setAccountsWithPaging, selectAccount } = accountSlice.actions;
+export const { setAccountsWithPaging, appendNextPage, selectAccount } = accountSlice.actions;
 
 // Selectors
 export const selectAccountState = (state: RootState) => state.account
